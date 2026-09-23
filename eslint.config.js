@@ -25,6 +25,7 @@ export default [
         clearTimeout: 'readonly',
         crypto: 'readonly',
         atob: 'readonly',
+        AbortController: 'readonly',
       },
     },
     plugins: { 'react-hooks': reactHooks },

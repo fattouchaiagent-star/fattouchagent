@@ -95,6 +95,12 @@ export async function getTaskEvents(taskId) {
   return response.json();
 }
 
+export async function getTask(taskId) {
+  const response = await request(`${API_BASE}/api/tasks/${taskId}`, { credentials: 'include' });
+  if (!response.ok) throw new Error(`task_get_failed:${response.status}`);
+  return response.json();
+}
+
 export async function listConversations() {
   const response = await request(`${API_BASE}/api/conversations`, { credentials: 'include' });
   if (!response.ok) throw new Error(`conversation_list_failed:${response.status}`);
