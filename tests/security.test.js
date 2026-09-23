@@ -102,6 +102,9 @@ test('protects conversations and CSRF mutations', async () => {
   const unauthenticated = await api('/api/conversations');
   assert.equal(unauthenticated.status, 401);
 
+  const missingSupabaseToken = await api('/api/auth/supabase-session', { method: 'POST', cookie: cookieA, csrfHeader: true });
+  assert.equal(missingSupabaseToken.status, 401);
+
   const missingCsrf = await api('/api/tasks', {
     method: 'POST', cookie: cookieA, body: { message: 'blocked' }, csrfHeader: false,
   });
