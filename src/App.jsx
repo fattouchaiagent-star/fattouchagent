@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { approveTask, blockContact, createListing, createTask, getConversation, getCurrentUser, getSponsoredStats, getTaskEvents, listNotifications, listSponsoredAds, listAdminListings, listAdminPayments, listAdminReports, listContactMessages, listContactRequests, listConversations, listOwnedListings, loginUser, logoutUser, markContactMessagesRead, markNotificationRead, mediaUrl, recordSponsoredClick, registerUser, reportContact, requestListingContact, reviewAdminListing, reviewAdminPayment, reviewAdminReport, searchListings, sendContactMessage, submitListingPayment, updateContactRequest, updateListing, uploadImage } from './services/apiClient';
+import { checkSupabaseConnection, isSupabaseConfigured } from './services/supabaseClient';
 import { intakeSchemas } from './services/intakeSchemas';
 import { classifyTask } from './services/taskRouter';
 
@@ -34,6 +35,7 @@ function App(){
  useEffect(()=>{const saved=sessionStorage.getItem('fattouch-demo');if(saved){try{setMessages(JSON.parse(saved))}catch{sessionStorage.removeItem('fattouch-demo')}}},[]);
  useEffect(()=>{sessionStorage.setItem('fattouch-demo',JSON.stringify(messages))},[messages]);
  useEffect(()=>{getCurrentUser().then(setUser).catch(()=>setUser(null));listConversations().then(result=>setConversations(result.data)).catch(()=>{});},[]);
+ useEffect(()=>{if(isSupabaseConfigured)checkSupabaseConnection().catch(()=>{})},[]);
  const title=useMemo(()=>active||'محادثة جديدة',[active]);
  const send=async()=>{if(!user){setMessages([{reply:true,kind:'auth_required'}]);return}const text=input.trim();if(!text&&!files.length)return;const kind=classifyTask(text, files.length > 0);const fileNames=files.map(f=>f.name);setActive((text||fileNames[0]).slice(0,28));setInput('');setFiles([]);setMessages(m=>[...m,{text:text||'حلّل الملفات المرفقة',files:fileNames},{loading:true,kind}]);try{const result=await createTask({message:text||'حلّل الملفات المرفقة',attachments:fileNames,conversationId});setConversationId(result.data.conversationId);listConversations().then(value=>setConversations(value.data)).catch(()=>{});setMessages(m=>m.map((x,i)=>i===m.length-1?{reply:true,kind,query:text,taskId:result.data.id,events:result.data.events}:x));const poll=async(count=0)=>{try{const events=await getTaskEvents(result.data.id);setMessages(m=>m.map(x=>x.taskId===result.data.id?{...x,events:events.data}:x));if(count<4)setTimeout(()=>poll(count+1),900)}catch{}};poll();}catch{setMessages(m=>m.map((x,i)=>i===m.length-1?{reply:true,kind,offline:true}:x))}};
  const reset=()=>{setActive('');setConversationId('');setMessages([]);setInput('');setFiles([]);setApproval('');sessionStorage.removeItem('fattouch-demo')};
