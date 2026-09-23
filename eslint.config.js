@@ -23,6 +23,8 @@ export default [
         FileReader: 'readonly',
         setTimeout: 'readonly',
         clearTimeout: 'readonly',
+        crypto: 'readonly',
+        atob: 'readonly',
       },
     },
     plugins: { 'react-hooks': reactHooks },
