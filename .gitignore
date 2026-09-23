@@ -1,0 +1,12 @@
+node_modules/
+dist/
+experiments/
+data/uploads/
+data/*.sqlite
+data/*.sqlite-shm
+data/*.sqlite-wal
+.env
+.env.*
+!.env.example
+server.log
+api-test.log
